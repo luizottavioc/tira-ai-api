@@ -1,0 +1,35 @@
+services:
+  app:
+    container_name: tira-ai-php
+    tty: true
+    build: ./
+    volumes:
+      - ./:/var/www/
+    depends_on:
+      - mysql
+      - redis
+    entrypoint: bash -c "php ./bin/hyperf.php start"
+    ports:
+      - 9501:9501
+
+  redis:
+    image: redis
+    container_name: tira-ai-redis
+    volumes:
+      - .docker/redis:/data
+    ports:
+      - "6381:6379"
+
+  mysql:
+    image: mysql:5.7
+    container_name: tira-ai-mysql
+    volumes:
+      - .docker/mysql:/var/lib/mysql
+    restart: always
+    environment:
+      MYSQL_DATABASE: ${DB_DATABASE}
+      MYSQL_USER: ${DB_USERNAME}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "3306:3306"
