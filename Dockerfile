@@ -1,6 +1,8 @@
 FROM hyperf/hyperf:8.3-alpine-v3.19-swoole
 
 ARG timezone
+ARG USER_ID=1000
+ARG GROUP_ID=1000
 
 ENV TIMEZONE=${timezone:-"America/Sao_Paulo"} \
     SCAN_CACHEABLE=(true)
@@ -22,11 +24,17 @@ RUN set -ex \
     && echo "${TIMEZONE}" > /etc/timezone \
     && rm -rf /var/cache/apk/* /tmp/* /usr/share/man
 
+RUN addgroup -g ${GROUP_ID} appgroup \
+    && adduser -u ${USER_ID} -G appgroup -s /bin/sh -D appuser
+
 WORKDIR /var/www
 COPY . /var/www
 
-RUN composer install --no-dev -o
+RUN composer install --no-dev -o \
+    && chown -R appuser:appgroup /var/www
+
+USER appuser
 
 EXPOSE 9501
 
-CMD ["/bin/sh", "-c" , "php bin/hyperf.php start"]
+CMD ["php", "bin/hyperf.php", "start"]
