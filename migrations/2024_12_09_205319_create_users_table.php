@@ -15,6 +15,7 @@ return new class extends Migration
             $table->bigIncrements('id');
             $table->string('name');
             $table->string('email')->unique();
+            $table->string('cellphone')->unique();
             $table->string('password');
             $table->datetimes();
             $table->softDeletes();

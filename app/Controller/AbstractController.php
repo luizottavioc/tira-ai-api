@@ -27,4 +27,11 @@ abstract class AbstractController
 
     #[Inject]
     protected ResponseInterface $response;
+
+    public function __construct(ResponseInterface $response, RequestInterface $request, ContainerInterface $container)
+    {
+        $this->response = $response;
+        $this->request = $request;
+        $this->container = $container;
+    }
 }
