@@ -4,68 +4,65 @@ declare(strict_types=1);
 
 namespace App\Service;
 
+use App\Exception\Auth\UserNotFoundException;
+use App\Exception\Auth\WrongPasswordException;
+use App\Model\User;
 use App\Request\Interface\LoginRequestInterface;
 use App\Request\Interface\UserRegisterRequestInterface;
 use App\Service\Interface\AuthServiceInterface;
+use Firebase\JWT\JWT;
 use function Hyperf\Support\env;
 
 class AuthService implements AuthServiceInterface
 {
     protected $jwtSecretKey;
+    private const int EXPIRATION_SECONDS = 3600;
 
     public function __construct()
     {
         $this->jwtSecretKey = env('JWT_SECRET_KEY');
     }
 
+    private function genToken(User $user): string
+    {
+        $tokenPayload = [
+            'uuid' => $user->uuid,
+            'email' => $user->email,
+            'iat' => time(),
+            'exp' => time() + self::EXPIRATION_SECONDS,
+        ];
+
+        return JWT::encode($tokenPayload, $this->jwtSecretKey, 'HS256');
+    }
+
     public function login(LoginRequestInterface $request): string
     {
-        // $email = $request->input('email');
-        // $password = $request->input('password');
+        $email = $request->getEmail();
 
-        // $user = $this->getUserByEmail($email);
+        $user = User::where('email', $email)->first();
+        if (!$user) {
+            throw new UserNotFoundException();
+        }
 
-        // if (!$user) {
-        //     return ['error' => 'Usuário não encontrado'];
-        // }
+        $password = $request->getPassword();
 
-        // if (password_verify($password, $user->password)) {
-        //     $tokenPayload = [
-        //         'uuid' => $user->uuid,
-        //         'email' => $user->email,
-        //         'iat' => time(),
-        //     ];
+        if (!password_verify($password, $user->password)) {
+            throw new WrongPasswordException();
+        }
 
-        //     $token = JWT::encode($tokenPayload, $this->jwtSecretKey, 'HS256');
-
-        //     return ['token' => $token];
-        // } else {
-        //     return ['error' => 'Senha incorreta'];
-        // }
-
-        return 'token';
+        return $this->genToken($user);
     }
 
     public function register(UserRegisterRequestInterface $request): string
     {
-        // $user = User::create([
-        //     'uuid' => Uuid::uuid4()->toString(),
-        //     'name' => $request->input('name'), 
-        //     'email' => $request->input('email'), 
-        //     'birth_date' => $request->input('birth_date'), 
-        //     'document' => $request->input('document'), 
-        //     'cellphone' => $request->input('cellphone'), 
-        //     'password' => password_hash($request->input('password'), PASSWORD_BCRYPT), 
-        //     'created_at' => Carbon::now(),
-        //     'updated_at' => Carbon::now(),
-        // ]);
-        
-        // if($user){
-        //     return true;
-        // }
-        // return false;
+        $user = User::create([
+            'name' => $request->getName(),
+            'email' => $request->getEmail(),
+            'cellphone' => $request->getCellphone(),
+            'password' => password_hash($request->getPassword(), PASSWORD_DEFAULT),
+        ]);
 
-        return 'token';
+        return $this->genToken($user);
     }
 
 }

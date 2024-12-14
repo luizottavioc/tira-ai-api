@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace App\Request;
 
 use App\Request\Interface\LoginRequestInterface;
-use Hyperf\HttpServer\Request;
+use Hyperf\Validation\Request\FormRequest;
 
-class LoginRequest extends Request implements LoginRequestInterface
+class LoginRequest extends FormRequest implements LoginRequestInterface
 {
     public function authorize(): bool
     {
@@ -18,17 +18,17 @@ class LoginRequest extends Request implements LoginRequestInterface
     {
         return [
             'email' => 'required|email',
-            'password' => 'required',
+            'password' => 'required|string|min:8',
         ];
     }
 
     public function messages():array
     {
         return [
-            'email.required' => 'O campo e-mail é obrigatório.',
-            'email.email' => 'O campo e-mail deve ser um endereço de e-mail válido.',
-            'password.required' => 'O campo senha é obrigatório.',
-            'password' => 'required|string|min:8',
+            'email.required' => 'E-mail is required.',
+            'email.email' => 'The email must be a valid email address.',
+            'password.required' => 'Password is required.',
+            'password' => 'Password must be at least 8 characters.',
         ];
     }
 

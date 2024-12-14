@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace App\Request;
 
 use App\Request\Interface\UserRegisterRequestInterface;
-use Hyperf\HttpServer\Request;
+use Hyperf\Validation\Request\FormRequest;
 
-class UserRegisterRequest extends Request implements UserRegisterRequestInterface
+class UserRegisterRequest extends FormRequest implements UserRegisterRequestInterface
 {
     public function authorize(): bool
     {
@@ -27,19 +27,19 @@ class UserRegisterRequest extends Request implements UserRegisterRequestInterfac
     public function messages():array
     {
         return [
-            'email.required' => 'O campo e-mail é obrigatório.',
-            'email.email' => 'O campo e-mail deve ser um endereço de e-mail válido.',
-            'email.unique' => 'O e-mail informado ja foi cadastrado.',
-            'name.required' => 'O campo nome é obrigatório.',
-            'name.string' => 'O campo nome deve ser uma string.',
-            'name.max' => 'O campo nome deve ter no máximo 60 caracteres.',
-            'cellphone.required' => 'O campo telefone é obrigatório.',
-            'cellphone.string' => 'O campo telefone deve ser uma string.',
-            'cellphone.max' => 'O campo telefone deve ter no máximo 20 caracteres.',
-            'cellphone.unique' => 'O telefone informado ja foi cadastrado.',
-            'password.required' => 'O campo senha é obrigatório.',
-            'password.string' => 'O campo senha deve ser uma string.',
-            'password.min' => 'O campo senha deve ter no máximo 8 caracteres.',
+            'email.required' => 'E-mail is required.',
+            'email.email' => 'The email must be a valid email address.',
+            'email.unique' => 'The email already exists.',
+            'name.required' => 'Name is required.',
+            'name.string' => 'Name must be a string.',
+            'name.max' => 'Name must be at most 60 characters.',
+            'cellphone.required' => 'Cellphone is required.',
+            'cellphone.string' => 'Cellphone must be a string.',
+            'cellphone.max' => 'Cellphone must be at most 20 characters.',
+            'cellphone.unique' => 'The cellphone already exists.',
+            'password.required' => 'Password is required.',
+            'password.string' => 'Password must be a string.',
+            'password.min' => 'Password must be at least 8 characters.',
         ];
     }
 

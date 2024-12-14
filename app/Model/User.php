@@ -7,6 +7,14 @@ namespace App\Model;
 use Hyperf\DbConnection\Model\Model;
 
 /**
+ * @property int $id 
+ * @property string $name 
+ * @property string $email 
+ * @property string $cellphone 
+ * @property string $password 
+ * @property \Carbon\Carbon $created_at 
+ * @property \Carbon\Carbon $updated_at 
+ * @property string $deleted_at 
  */
 class User extends Model
 {
@@ -18,10 +26,10 @@ class User extends Model
     /**
      * The attributes that are mass assignable.
      */
-    protected array $fillable = [];
+    protected array $fillable = ['name', 'email', 'cellphone', 'password'];
 
     /**
      * The attributes that should be cast to native types.
      */
-    protected array $casts = [];
+    protected array $casts = ['id' => 'integer', 'created_at' => 'datetime', 'updated_at' => 'datetime'];
 }
