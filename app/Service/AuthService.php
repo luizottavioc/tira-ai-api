@@ -12,17 +12,13 @@ use App\Request\Interface\UserRegisterRequestInterface;
 use App\Service\Interface\AuthServiceInterface;
 use Carbon\Carbon;
 use Firebase\JWT\JWT;
+use Firebase\JWT\Key;
 use function Hyperf\Support\env;
 
 class AuthService implements AuthServiceInterface
 {
-    protected $jwtSecretKey;
     private const int EXPIRATION_SECONDS = 3600;
-
-    public function __construct()
-    {
-        $this->jwtSecretKey = env('JWT_SECRET_KEY');
-    }
+    private const string ALGORITHM = 'HS256';
 
     private function expirationTime(): int
     {
@@ -39,7 +35,19 @@ class AuthService implements AuthServiceInterface
             'exp' => $expirationTime,
         ];
 
-        return JWT::encode($tokenPayload, $this->jwtSecretKey, 'HS256');
+        return JWT::encode(
+            $tokenPayload, 
+            env('JWT_SECRET_KEY'), 
+            self::ALGORITHM
+        );
+    }
+
+    static function decodeToken(string $token): object
+    {
+        return JWT::decode(
+            $token, 
+            new Key(env('JWT_SECRET_KEY'), self::ALGORITHM)
+        );
     }
 
     public function login(LoginRequestInterface $request): array

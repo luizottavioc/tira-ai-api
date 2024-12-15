@@ -9,14 +9,15 @@ declare(strict_types=1);
  * @contact  group@hyperf.io
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
-use App\Middleware\JwtAuthMiddleware;
 use Hyperf\HttpServer\Router\Router;
+use App\Middleware\JwtAuthMiddleware;
 
 use App\Controller\AuthController;
 
-Router::addRoute(['GET'], '/hello-world', function () { return 'Hello World'; }, ['middleware' => [JwtAuthMiddleware::class]]);
+Router::addRoute(['GET'], '/ping', function () { return 'pong'; });
 
 Router::addGroup('/auth', function () {
     Router::post('/login', [AuthController::class, 'login']);
     Router::post('/register', [AuthController::class, 'register']);
+    Router::get('/me', [AuthController::class, 'me'], [ 'middleware' => [JwtAuthMiddleware::class] ]);
 });

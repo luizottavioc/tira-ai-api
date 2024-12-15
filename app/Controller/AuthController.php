@@ -37,4 +37,11 @@ class AuthController extends AbstractController
             return $this->sendError('Unexpected error', 500);
         }
     }
+
+    public function me(): ResponseInterface
+    {
+        $user = $this->container->get('user');
+        return $this->sendResponse('', 200, [$user]);
+
+    }
 }
