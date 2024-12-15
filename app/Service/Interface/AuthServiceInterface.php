@@ -9,8 +9,8 @@ use App\Request\Interface\UserRegisterRequestInterface;
 
 interface AuthServiceInterface 
 {
-    public function login(LoginRequestInterface $request): string;
-    public function register(UserRegisterRequestInterface $request): string;
+    public function login(LoginRequestInterface $request): array;
+    public function register(UserRegisterRequestInterface $request): array;
     // public function logout(string $token): void;
     // public function refresh(string $token): string;
 }

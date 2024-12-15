@@ -14,7 +14,7 @@ use Hyperf\DbConnection\Model\Model;
  * @property string $password 
  * @property \Carbon\Carbon $created_at 
  * @property \Carbon\Carbon $updated_at 
- * @property string $deleted_at 
+ * @property \Carbon\Carbon $deleted_at 
  */
 class User extends Model
 {
@@ -31,5 +31,10 @@ class User extends Model
     /**
      * The attributes that should be cast to native types.
      */
-    protected array $casts = ['id' => 'integer', 'created_at' => 'datetime', 'updated_at' => 'datetime'];
+    protected array $casts = ['id' => 'integer', 'created_at' => 'datetime', 'updated_at' => 'datetime', 'deleted_at' => 'datetime'];
+
+    /**
+     * The attributes that are mass assignable.
+     */
+    protected array $hidden = ['password'];
 }

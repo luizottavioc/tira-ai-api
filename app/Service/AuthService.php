@@ -10,6 +10,7 @@ use App\Model\User;
 use App\Request\Interface\LoginRequestInterface;
 use App\Request\Interface\UserRegisterRequestInterface;
 use App\Service\Interface\AuthServiceInterface;
+use Carbon\Carbon;
 use Firebase\JWT\JWT;
 use function Hyperf\Support\env;
 
@@ -23,19 +24,25 @@ class AuthService implements AuthServiceInterface
         $this->jwtSecretKey = env('JWT_SECRET_KEY');
     }
 
-    private function genToken(User $user): string
+    private function expirationTime(): int
     {
+        return time() + self::EXPIRATION_SECONDS;
+    }
+
+    private function genToken(User $user, int $expirationTime = null): string
+    {
+        $expirationTime ??= $this->expirationTime();
         $tokenPayload = [
-            'uuid' => $user->uuid,
+            'id' => $user->id,
             'email' => $user->email,
             'iat' => time(),
-            'exp' => time() + self::EXPIRATION_SECONDS,
+            'exp' => $expirationTime,
         ];
 
         return JWT::encode($tokenPayload, $this->jwtSecretKey, 'HS256');
     }
 
-    public function login(LoginRequestInterface $request): string
+    public function login(LoginRequestInterface $request): array
     {
         $email = $request->getEmail();
 
@@ -50,10 +57,14 @@ class AuthService implements AuthServiceInterface
             throw new WrongPasswordException();
         }
 
-        return $this->genToken($user);
+        $expirationTime = $this->expirationTime();
+        $expiresIn = Carbon::now()->addSeconds(self::EXPIRATION_SECONDS);
+        $token = $this->genToken($user, $expirationTime);
+
+        return [ 'token' => $token, 'expires_in' => $expiresIn, 'user' => $user->toArray() ];
     }
 
-    public function register(UserRegisterRequestInterface $request): string
+    public function register(UserRegisterRequestInterface $request): array
     {
         $user = User::create([
             'name' => $request->getName(),
@@ -62,7 +73,11 @@ class AuthService implements AuthServiceInterface
             'password' => password_hash($request->getPassword(), PASSWORD_DEFAULT),
         ]);
 
-        return $this->genToken($user);
+        $expirationTime = $this->expirationTime();
+        $expiresAt = Carbon::now()->addSeconds(self::EXPIRATION_SECONDS);
+        $token = $this->genToken($user, $expirationTime);
+
+        return [ 'token' => $token, 'expires_at' => $expiresAt, 'user' => $user->toArray() ];
     }
 
 }

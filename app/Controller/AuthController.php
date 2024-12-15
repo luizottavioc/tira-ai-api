@@ -19,12 +19,10 @@ class AuthController extends AbstractController
     public function login(LoginRequest $request): ResponseInterface
     {
         try {
-            $token = $this->authService->login($request);
-            return $this->sendResponse('User logged successfully', 200, [ 'token' => $token ]);
-        } catch (UserNotFoundException $th) {
-            return $this->sendError('User not found', 404);
-        } catch (WrongPasswordException $th) {
-            return $this->sendError('Wrong password.', 401);
+            $loginResponse = $this->authService->login($request);
+            return $this->sendResponse('User logged successfully', 200, $loginResponse);
+        } catch (UserNotFoundException | WrongPasswordException $exception) {
+            return $this->sendError($exception->getMessage(), $exception->getCode());
         } catch (\Throwable $th) {
             return $this->sendError('Unexpected error', 500);
         }
@@ -33,8 +31,8 @@ class AuthController extends AbstractController
     public function register(UserRegisterRequest $request): ResponseInterface
     {
         try {
-            $token = $this->authService->register($request);
-            return $this->sendResponse('User registered successfully', 200, [ 'token' => $token ]);
+            $registerResponse = $this->authService->register($request);
+            return $this->sendResponse('User registered successfully', 200, $registerResponse);
         } catch (\Throwable $th) {
             return $this->sendError('Unexpected error', 500);
         }
