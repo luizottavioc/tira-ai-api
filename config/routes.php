@@ -20,4 +20,5 @@ Router::addGroup('/auth', function () {
     Router::post('/login', [AuthController::class, 'login']);
     Router::post('/register', [AuthController::class, 'register']);
     Router::get('/me', [AuthController::class, 'me'], [ 'middleware' => [JwtAuthMiddleware::class] ]);
+    Router::get('/refresh-token', [AuthController::class, 'refreshToken'], [ 'middleware' => [JwtAuthMiddleware::class] ]);
 });

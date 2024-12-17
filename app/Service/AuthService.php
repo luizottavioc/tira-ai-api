@@ -50,6 +50,13 @@ class AuthService implements AuthServiceInterface
         );
     }
 
+    static function refreshToken(string $token): string
+    {
+        $decodedToken = self::decodeToken($token);
+        $user = User::where('id', $decodedToken->id)->first();
+        return self::genToken($user);
+    }
+
     public function login(LoginRequestInterface $request): array
     {
         $email = $request->getEmail();
@@ -107,5 +114,12 @@ class AuthService implements AuthServiceInterface
             'expires_at' => $expiresAt,
             'user' => $user->toArray()
         ];
+    }
+
+    public function logout(string $token): void
+    {
+        $decodedToken = self::decodeToken($token);
+        $user = User::where('id', $decodedToken->id)->first();
+        $user->tokens()->delete();
     }
 }

@@ -48,4 +48,15 @@ class AuthController extends AbstractController
             return $this->sendError('Unexpected error', 500);
         }
     }
+
+    public function refreshToken(): ResponseInterface
+    {
+        try {
+            $token = (string) $this->container->get('token');
+            $newToken = $this->authService->refreshToken($token);
+            return $this->sendResponse('Refreshed token', 200, [ 'token' => $newToken ]);
+        } catch (\Throwable $th) {
+            return $this->sendError('Unexpected error', 500);
+        }
+    }
 }
