@@ -40,8 +40,12 @@ class AuthController extends AbstractController
 
     public function me(): ResponseInterface
     {
-        $user = $this->container->get('user');
-        return $this->sendResponse('', 200, [$user]);
-
+        try {
+            $token = (string) $this->container->get('token');
+            $meResponse = $this->authService->getMe($token);
+            return $this->sendResponse('Logged user data', 200, $meResponse);
+        } catch (\Throwable $th) {
+            return $this->sendError('Unexpected error', 500);
+        }
     }
 }

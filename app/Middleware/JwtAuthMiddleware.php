@@ -53,13 +53,20 @@ class JwtAuthMiddleware implements MiddlewareInterface
 
         try {
             $token = explode(' ', $authorization[0])[1];
-            $decodedToken = AuthService::decodeToken($token);
-            $this->container->set('user', $decodedToken);
+            $this->setContainerData($token);
         } catch (\Exception $e) {
             $responseError = $this->buildResponseMessage('Invalid token');
             return $this->response->json($responseError)->withStatus(401);
         }
 
         return $handler->handle($request);
+    }
+
+    private function setContainerData(string $token): void
+    {
+        $decodedToken = AuthService::decodeToken($token);
+
+        $this->container->set('token', (string) $token);
+        $this->container->set('idUser', (int) $decodedToken->id);
     }
 }

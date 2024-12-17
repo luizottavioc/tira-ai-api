@@ -20,14 +20,14 @@ class AuthService implements AuthServiceInterface
     private const int EXPIRATION_SECONDS = 3600;
     private const string ALGORITHM = 'HS256';
 
-    private function expirationTime(): int
+    static function expirationTime(): int
     {
         return time() + self::EXPIRATION_SECONDS;
     }
 
-    private function genToken(User $user, int $expirationTime = null): string
+    static function genToken(User $user, int $expirationTime = null): string
     {
-        $expirationTime ??= $this->expirationTime();
+        $expirationTime ??= self::expirationTime();
         $tokenPayload = [
             'id' => $user->id,
             'email' => $user->email,
@@ -65,11 +65,15 @@ class AuthService implements AuthServiceInterface
             throw new WrongPasswordException();
         }
 
-        $expirationTime = $this->expirationTime();
+        $expirationTime = self::expirationTime();
         $expiresIn = Carbon::now()->addSeconds(self::EXPIRATION_SECONDS);
-        $token = $this->genToken($user, $expirationTime);
+        $token = self::genToken($user, $expirationTime);
 
-        return [ 'token' => $token, 'expires_in' => $expiresIn, 'user' => $user->toArray() ];
+        return [ 
+            'token' => $token, 
+            'expires_in' => $expiresIn, 
+            'user' => $user->toArray() 
+        ];
     }
 
     public function register(UserRegisterRequestInterface $request): array
@@ -81,11 +85,27 @@ class AuthService implements AuthServiceInterface
             'password' => password_hash($request->getPassword(), PASSWORD_DEFAULT),
         ]);
 
-        $expirationTime = $this->expirationTime();
+        $expirationTime = self::expirationTime();
         $expiresAt = Carbon::now()->addSeconds(self::EXPIRATION_SECONDS);
-        $token = $this->genToken($user, $expirationTime);
+        $token = self::genToken($user, $expirationTime);
 
-        return [ 'token' => $token, 'expires_at' => $expiresAt, 'user' => $user->toArray() ];
+        return [ 
+            'token' => $token, 
+            'expires_at' => $expiresAt, 
+            'user' => $user->toArray() 
+        ];
     }
 
+    public function getMe(string $token): array
+    {
+        $decodedToken = self::decodeToken($token);
+        $user = User::where('id', $decodedToken->id)->first();
+        $expiresAt = new Carbon($decodedToken->exp);
+
+        return [
+            'token' => $token,
+            'expires_at' => $expiresAt,
+            'user' => $user->toArray()
+        ];
+    }
 }

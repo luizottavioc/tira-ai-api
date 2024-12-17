@@ -13,7 +13,6 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use App\Trait\HttpMessageResponse;
-use Hyperf\Di\Annotation\Inject;
 use Hyperf\HttpServer\Contract\RequestInterface;
 use Hyperf\HttpServer\Contract\ResponseInterface;
 use Psr\Container\ContainerInterface;
@@ -23,14 +22,11 @@ abstract class AbstractController
 {
     use HttpMessageResponse;
     
-    #[Inject]
-    protected ContainerInterface $container;
-    
-    #[Inject]
-    protected RequestInterface $request;
-    
-    #[Inject]
-    protected ResponseInterface $response; 
+    public function __construct(
+        protected ContainerInterface $container,
+        protected RequestInterface $request,
+        protected ResponseInterface $response
+    ) {}
 
     public function sendResponse(string $message, int $statusCode, array $data = []): MessageResponseInterface
     {
