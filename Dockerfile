@@ -1,11 +1,15 @@
 FROM hyperf/hyperf:8.3-alpine-v3.19-swoole
 
 ARG timezone
+ARG UID=1000
 
 ENV TIMEZONE=${timezone:-"America/Sao_Paulo"} \
     SCAN_CACHEABLE=(true)
 
 RUN set -ex \
+    && apk add --no-cache shadow \
+    && addgroup -g ${UID} hyperf \
+    && adduser -u ${UID} -G hyperf -h /home/hyperf -s /bin/sh -D hyperf \
     && php --ri swoole \
     && cd /etc/php* \
     && { \
@@ -20,9 +24,11 @@ RUN set -ex \
 
 WORKDIR /var/www
 COPY . /var/www
+RUN chown -R hyperf:hyperf /var/www
 
 COPY start.sh /
 
+USER hyperf
 EXPOSE 9501
 
 CMD ["/start.sh"]
