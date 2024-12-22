@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+use Hyperf\Di\Annotation\Inject;
 use App\Exception\Auth\UserNotFoundException;
 use App\Exception\Auth\WrongPasswordException;
 use App\Request\LoginRequest;
@@ -13,8 +14,8 @@ use Psr\Http\Message\ResponseInterface;
 
 class AuthController extends AbstractController
 {
-    public function __construct(private AuthServiceInterface $authService)
-    {}
+    #[Inject]
+    private AuthServiceInterface $authService;
 
     public function login(LoginRequest $request): ResponseInterface
     {
