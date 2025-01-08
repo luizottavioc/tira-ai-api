@@ -12,6 +12,8 @@ use Hyperf\DbConnection\Model\Model;
  * @property string $email 
  * @property string $cellphone 
  * @property string $password 
+ * @property boolean $is_admin
+ * @property int $level
  * @property \Carbon\Carbon $created_at 
  * @property \Carbon\Carbon $updated_at 
  * @property \Carbon\Carbon $deleted_at 

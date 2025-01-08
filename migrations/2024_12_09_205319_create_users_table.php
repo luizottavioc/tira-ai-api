@@ -17,6 +17,8 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->string('cellphone')->unique();
             $table->string('password');
+            $table->boolean('is_admin')->default(false);
+            $table->integer('level')->default(1);
             $table->datetimes();
             $table->softDeletes();
         });
