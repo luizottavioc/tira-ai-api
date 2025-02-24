@@ -26,6 +26,6 @@ class AppSeederCommand extends HyperfCommand
     {
         $this->call('db:seed', ['--path' => './seeders/sports_seeder.php']);
         $this->call('db:seed', ['--path' => './seeders/positions_seeder.php']);
-        $this->call('db:seed', ['--path' => './seeders/users.php']);
+        $this->call('db:seed', ['--path' => './seeders/users_seeder.php']);
     }
 }
