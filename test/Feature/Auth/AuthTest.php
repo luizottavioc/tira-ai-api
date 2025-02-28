@@ -7,8 +7,6 @@ namespace Test\Feature\Auth;
 use Hyperf\Testing\Client;
 use Hyperf\Testing\TestCase;
 
-// use PHPUnit\Framework\TestCase;
-
 use function Hyperf\Support\make;
 
 class AuthTest extends TestCase
@@ -21,10 +19,18 @@ class AuthTest extends TestCase
         $this->client = make(Client::class);
     }
     
-    public function testLogin()
+    public function testLoginAdmin(): void
     {
-        $this->assertTrue(true);
-        $this->get('/ping')->assertOk()->assertSee('pong');
+        $response = $this->post('/auth/login', [
+            'email' => 'admin@tira.ai',
+            'password' => 'password',
+        ]);
+
+        $response->assertStatus(200);
+        
+        $resData = $response->json()['data'];
+        $this->assertArrayHasKey('token', $resData);
+        $this->assertArrayHasKey('user', $resData);
     }
 }
 
